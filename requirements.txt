@@ -1,0 +1,8 @@
+flask
+transformers
+torch
+spacy
+nltk
+python-dotenv
+pyotp
+better-profanity
