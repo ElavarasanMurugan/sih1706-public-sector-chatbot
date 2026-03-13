@@ -22,33 +22,58 @@ function App() {
     setIsLoggedIn(true);
   };
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = async (file) => {
     setMessages(prev => [
       ...prev,
-      { sender: "user", text: `📄 Uploaded: ${file.name}` },
+      { sender: "user", text: `📄 Uploaded: ${file.name}` }
     ]);
     setIsTyping(true);
-    setTimeout(() => {
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("http://localhost:5000/upload-doc", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
       setIsTyping(false);
       setMessages(prev => [
         ...prev,
-        { sender: "bot", text: `I've received "${file.name}". I'll analyze and summarize it once the backend is connected!` }
+        { sender: "bot", text: data.summary || "Could not process document." }
       ]);
-    }, 1500);
+    } catch (error) {
+      setIsTyping(false);
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: "⚠️ Could not connect to server. Make sure the backend is running!" }
+      ]);
+    }
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
     setMessages(prev => [...prev, { sender: "user", text: input }]);
+    const userInput = input;
     setInput("");
     setIsTyping(true);
-    setTimeout(() => {
+
+    try {
+      const res = await fetch("http://localhost:5000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userInput })
+      });
+      const data = await res.json();
+      setIsTyping(false);
+      setMessages(prev => [...prev, { sender: "bot", text: data.response }]);
+    } catch (error) {
       setIsTyping(false);
       setMessages(prev => [
         ...prev,
-        { sender: "bot", text: "I'm processing your request. Backend coming soon!" }
+        { sender: "bot", text: "⚠️ Could not connect to server. Make sure the backend is running!" }
       ]);
-    }, 1500);
+    }
   };
 
   const handleKey = (e) => {
