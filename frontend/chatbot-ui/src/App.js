@@ -1,20 +1,34 @@
 import { useState } from "react";
+import Login from "./Login";
+import FileUpload from "./FileUpload";
 import "./App.css";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const [messages, setMessages] = useState([
     { sender: "bot", text: "Hi! I'm your Public Sector Assistant. How can I help you today?" }
   ]);
   const [input, setInput] = useState("");
 
+  const handleLogin = (email) => {
+    setUserEmail(email);
+    setIsLoggedIn(true);
+  };
+
+  const handleFileUpload = (file) => {
+    setMessages(prev => [
+      ...prev,
+      { sender: "user", text: `📄 Uploaded: ${file.name}` },
+      { sender: "bot", text: `I've received "${file.name}". I'll analyze and summarize it once the backend is connected!` }
+    ]);
+  };
+
   const sendMessage = () => {
     if (!input.trim()) return;
-
     const userMsg = { sender: "user", text: input };
     setMessages([...messages, userMsg]);
     setInput("");
-
-    // Temporary bot reply (will connect to backend later)
     setTimeout(() => {
       setMessages(prev => [
         ...prev,
@@ -27,16 +41,22 @@ function App() {
     if (e.key === "Enter") sendMessage();
   };
 
+  if (!isLoggedIn) return <Login onLogin={handleLogin} />;
+
   return (
     <div className="app">
       <div className="chat-container">
-        {/* Header */}
+
+        {/* ✅ Updated Header */}
         <div className="chat-header">
-          <span className="bot-avatar">🤖</span>
-          <div>
+          <div className="bot-avatar">🤖</div>
+          <div className="header-info">
             <h2>Public Sector Assistant</h2>
-            <span className="status">● Online</span>
+            <span className="status">{userEmail}</span>
           </div>
+          <button className="logout-btn" onClick={() => setIsLoggedIn(false)}>
+            Logout
+          </button>
         </div>
 
         {/* Messages */}
@@ -50,6 +70,9 @@ function App() {
           ))}
         </div>
 
+        {/* File Upload */}
+        <FileUpload onFileUpload={handleFileUpload} />
+
         {/* Input */}
         <div className="chat-input">
           <input
@@ -61,6 +84,7 @@ function App() {
           />
           <button onClick={sendMessage}>Send ➤</button>
         </div>
+
       </div>
     </div>
   );
