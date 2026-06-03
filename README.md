@@ -52,6 +52,7 @@ sih1706-public-sector-chatbot/
 ```bash
 git clone https://github.com/ElavarasanMurugan/sih1706-public-sector-chatbot.git
 cd sih1706-public-sector-chatbot
+
 ```
 
 ### 2. Setup Backend
@@ -68,6 +69,7 @@ python app.py
 cd frontend/chatbot-ui
 npm install
 npm start
+
 ```
 
 ### 4. Access the app
@@ -91,3 +93,4 @@ npm start
 ## 👨‍💻 Author
 Developed for Smart India Hackathon (SIH) 2024
 Problem ID: SIH1706
+
